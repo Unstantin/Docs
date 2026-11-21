@@ -1,0 +1,23 @@
+name: Publish to Wiki
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'Our-team.md' ]
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone Wiki Repo
+        run: git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git wiki
+      - name: Copy file to Wiki
+        run: cp Our-team.md wiki/
+      - name: Commit and Push to Wiki
+        run: |
+          cd wiki
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Our-team.md
+          git diff-index --quiet HEAD || git commit -m "Auto-publish Our-team.md from Docs repo"
+          git push
